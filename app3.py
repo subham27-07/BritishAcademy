@@ -1,5 +1,6 @@
 #APP
 #checked
+from linecache import cache
 import streamlit as st
 import pandas as pd 
 import numpy as np
@@ -16,7 +17,7 @@ from IPython.display import HTML, display
 
 
 
-
+import moralizer
 ######################################################
 
 
@@ -25,6 +26,7 @@ from bertopic import BERTopic
 from transformers import pipeline
 
 import networkx as nx
+
 
 from datetime import datetime
 
@@ -53,34 +55,22 @@ import regex as re
 import altair as alt
 from transformers import GPT2Tokenizer
 
+from typing import NamedTuple
+
+
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
+
+from geopy.geocoders import Nominatim
+
+################### Redis Cache ################
+
 ###############################Import LIWC############
-# import liwc
 
-# from collections import Counter
-# from community import community_louvain
-# from spacy.lang.en import English
-# nlp = English()
-# tokenizer = nlp.tokenizer
-# import spacy 
-
-
-# from pyvis import network as net
-# from IPython.core.display import display, HTML
-
-# spacy.cli.download("en_core_web_sm")
-# spacy.load('en_core_web_sm')
-# nlp = spacy.load("en_core_web_sm")
-
-# import argparse
-# parser = argparse.ArgumentParser()
-
-# args = parser.parse_args()
 ############################################################
 
 from pivottablejs import pivot_ui
 
-st.title ("British Academy Data Analysis Tool")
+st.title ("Twitter Data Analysis Tool")
 # st.sidebar.title("Analysis of Tweets")
 st.markdown("This application is a Streamlit dashboard used to analyze sentiments, Emotions of tweets and Topic Modelling")
 # st.sidebar.markdown("This application is a Streamlit dashboard used ""to analyze sentiments of tweets")
@@ -117,8 +107,16 @@ def cleanTxt(text):
 #spectra_df['body']=spectra_df['body'].apply(cleanTxt)
 ########################## Apply clean on DF #########################
 
+from spacy.lang.en import English
+from collections import Counter
+from community import community_louvain
+import re
+import liwc
+nlp = English()
+tokenizer = nlp.tokenizer
+#########################################################################
 
-#st.write(df.head()) #write new df Head(Top5)
+# parse, category_names = liwc.load_token_parser('LIWC2007_English100131.dic')
 
 
 
@@ -129,8 +127,8 @@ def cleanTxt(text):
 # df = df[(~df["clean_text"].isna())&(df["clean_text"].str.len()>0)&(df["clean_text"]!= "_url_")].copy()
 # df_no_dup = df.drop_duplicates("clean_text")
 
-# tokenizer = nlp.tokenizer
-# # def getMoralCounts(text):
+
+# def getMoralCounts(text):
 #   tokens = tokenizer(text)
 #   tokens = [t.lower_ for t in tokens]
 #   return dict(Counter(category for token in tokens for category in parse(token)))
@@ -144,6 +142,7 @@ def cleanTxt(text):
 
 
 ############################## Hastag Analysis ################
+
 
 def hastag():
     G = nx.DiGraph()
@@ -183,12 +182,29 @@ def hastag():
 
     hashtagCounts = sorted(Counter(allHashtags).items(),key=lambda x: x[1],reverse=True)
 
-    fig = px.bar(x=[i[1] for i in hashtagCounts[:20]],y=[i[0] for i in hashtagCounts[:20]])
+    fig = px.bar(x=[i[1] for i in hashtagCounts[:20]],y=[i[0] for i in hashtagCounts[:20]],color=[i[1] for i in hashtagCounts[:20]])
 
     st.write(fig)
 
 
 #####################################################################
+
+def emotionAnalysis():
+    emotion = pipeline('sentiment-analysis', model='arpanghoshal/EmoRoBERTa')
+    def get_emotion_label(text):
+        return(emotion(text)[0]['label'])
+
+    df['clean_text'][1:10].apply(get_emotion_label)
+    df['emotion'] = df['clean_text'].apply(get_emotion_label)
+    # emotion_count = df['emotion'].value_counts()
+    # emotion_count = pd.DataFrame({'Emotion':emotion.index, 'Tweets':emotion.values})
+
+    fig = px.scatter(df, x=df['emotion'], y=df['created_at'], marginal_x="histogram", marginal_y="rug",color=df['emotion'], width=700,height=900)
+    st.plotly_chart(fig)
+
+# st.write(fig)
+
+    
 
 
 
@@ -230,13 +246,29 @@ def Sentiment():
         )
     )
 
-    fig = px.scatter(df, x=df['score'], y=df['created_at'], marginal_x="histogram", marginal_y="rug", width=700,height=900)
+    fig = px.scatter(df, x=df['score'], y=df['created_at'], marginal_x="histogram", marginal_y="rug",color=df['label'], width=700,height=900)
 
     st.plotly_chart(fig)
 
 
+######################################GeoCode#############################################
+# geolocator = Nominatim(user_agent='twitter-analysis-cl')
+# locs=df['user_location']
+# geolocated = list(map(lambda x: [x,geolocator.geocode(x)[1] if geolocator.geocode(x) else None],locs))
+# geolocated = pd.DataFrame(geolocated)
+# geolocated.columns = ['locat','latlong']
+# geolocated['lat'] = geolocated.latlong.apply(lambda x: x[0])
+# geolocated['lon'] = geolocated.latlong.apply(lambda x: x[1])
+# geolocated.drop('latlong',axis=1, inplace=True)
+
+
+##################################################################################
+
+
 key=1
-selectOptions=['Emotion Analysis','Sentiment Analysis' , 'Hastag Analysis', 'Topic Modelling', 'Emotion Analysis']
+selectOptions=['Network Analysis','Sentiment Analysis' , 'Hastag Analysis', 'Topic Modelling', 'Emotion Analysis', 'GeoCode']
+
+
 
 def addSelect():
     global key
@@ -251,22 +283,46 @@ def selector(select):
     global selectOptions
 
     if select == 'Topic Modelling':
+        st.markdown("Topic Models are very useful for the purpose for document clustering, organizing large blocks of textual data, information retrieval from unstructured text and feature selection.")
+        st.image("Topic Model.png")
+        st.markdown("Where the frequency of each word t is extracted for each class i and divided by the total number of words w. This action can be seen as a form of regularization of frequent words in the class. Next, the total, unjoined, number of documents m is divided by the total frequency of word t across all classes n.")
         TopiModelling()
         ind=selectOptions.index('Topic Modelling')
         selectOptions.pop(ind)
         addSelect()
         
     elif select == 'Sentiment Analysis':
+        st.markdown("Sentiment analysis, also referred to as opinion mining, is an approach to natural language processing (NLP) that identifies the emotional tone behind a body of text. This is a popular way for organizations to determine and categorize opinions about a product, service, or idea.")
+        st.image("full_nlp_pipeline.png")
         Sentiment()
+        random_tweet = st.radio('Show Examples', ('POS', 'NEU', 'NEG'))
+        st.markdown(df.query("label == @random_tweet")[["text"]].sample(n=1).iat[0, 0])
         ind=selectOptions.index('Sentiment Analysis')
         selectOptions.pop(ind)
         addSelect()
     
     elif select == 'Hastag Analysis':
+        st.markdown("Hastag Analysis is used to measure the social media reach of hashtag campaign and its mentions. To measure social media engagement around your hashtag. To discover social media sentiment around a hashtag.")
         hastag()
         ind=selectOptions.index('Hastag Analysis')
         selectOptions.pop(ind)
         addSelect()
+
+    elif select == 'Emotion Analysis':
+        st.markdown("Emotion analysis is the process of identifying and analyzing the underlying emotions expressed in textual data. Emotion analytics can extract the text data from multiple sources to analyze the subjective information and understand the emotions behind it.")
+        st.image("Emotion.png")
+        emotionAnalysis()
+        random_tweet = st.radio('Shows Examples', ('amusement', 'anger', 'annoyance', 'confusion', 'disapproval', 'excitement', 'love', 'suprise'))
+        st.markdown(df.query("emotion == @random_tweet")[["text"]].sample(n=1).iat[0, 0])
+        ind=selectOptions.index('Emotion Analysis')
+        selectOptions.pop(ind)
+        addSelect()
+
+    # elif select == 'GeoCode':
+    #     geocode()
+    #     ind=selectOptions.index('GeoCode')
+    #     selectOptions.pop(ind)
+    #     addSelect()
         
 
 addSelect()
@@ -297,10 +353,10 @@ addSelect()
 
 
 
-# t= pivot_ui(df)
+t= pivot_ui(df)
 
-# with open(t.src, encoding="utf8") as t:
-#     components.html(t.read(), width=900, height=1000, scrolling=True)
+with open(t.src, encoding="utf8") as t:
+    components.html(t.read(), width=900, height=1000, scrolling=True)
 
 
 
