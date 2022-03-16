@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
 import plotly.express as px
-
+import base64
 import re
 #####################################################
 from IPython.display import HTML, display
@@ -298,12 +298,13 @@ def addSelect():
 def selector(select):
     global selectOptions
 
-
     if select == 'Topic Modelling':
         st.markdown("Topic Models are very useful for the purpose for document clustering, organizing large blocks of textual data, information retrieval from unstructured text and feature selection.")
         st.image("Topic Model.png")
         st.markdown("Where the frequency of each word t is extracted for each class i and divided by the total number of words w. This action can be seen as a form of regularization of frequent words in the class. Next, the total, unjoined, number of documents m is divided by the total frequency of word t across all classes n.")
-        TopiModelling()
+        result=st.button('Analysis',key=6)
+        if result:
+            TopiModelling()
         ind=selectOptions.index('Topic Modelling')
         selectOptions.pop(ind)
         addSelect()
@@ -311,7 +312,9 @@ def selector(select):
     elif select == 'Sentiment Analysis':
         st.markdown("Sentiment analysis, also referred to as opinion mining, is an approach to natural language processing (NLP) that identifies the emotional tone behind a body of text. This is a popular way for organizations to determine and categorize opinions about a product, service, or idea.")
         st.image("full_nlp_pipeline.png")
-        Sentiment()
+        result=st.button('Analysis',key=7)
+        if result:
+            Sentiment()
         random_tweet = st.radio('Show Examples', ('POS', 'NEU', 'NEG'))
         st.markdown(df.query("label == @random_tweet")[["text"]].sample(n=1).iat[0, 0])
         ind=selectOptions.index('Sentiment Analysis')
@@ -320,15 +323,18 @@ def selector(select):
     
     elif select == 'Hastag Analysis':
         st.markdown("Hastag Analysis is used to measure the social media reach of hashtag campaign and its mentions. To measure social media engagement around your hashtag. To discover social media sentiment around a hashtag.")
-        hastag()
+        result=st.button('Analysis',key=8)
+        if result:
+            hastag()
         ind=selectOptions.index('Hastag Analysis')
         selectOptions.pop(ind)
         addSelect()
 
     elif select == 'Emotion Analysis':
         st.markdown("Emotion analysis is the process of identifying and analyzing the underlying emotions expressed in textual data. Emotion analytics can extract the text data from multiple sources to analyze the subjective information and understand the emotions behind it.")
-        st.image("Emotion.png")
-        emotionAnalysis()
+        result=st.button('Analysis',key=9)
+        if result:
+            emotionAnalysis()
         random_tweet = st.radio('Shows Examples', ('amusement', 'anger', 'annoyance', 'confusion', 'disapproval', 'excitement', 'love', 'suprise'))
         st.markdown(df.query("emotion == @random_tweet")[["text"]].sample(n=1).iat[0, 0])
         ind=selectOptions.index('Emotion Analysis')
@@ -371,10 +377,16 @@ addSelect()
 
 
 t= pivot_ui(df)
+st.markdown("![Alt Text](https://pivottable.js.org/images/animation.gif)")
+# video_file = open('animation.gif', 'rb')
+# video_bytes = video_file.read()
+
+# st.video(video_bytes)
+
 
 with open(t.src, encoding="utf8") as t:
     components.html(t.read(), width=900, height=1000, scrolling=True)
-
+    
 
 
 
