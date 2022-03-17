@@ -119,31 +119,20 @@ import liwc
 nlp = English()
 tokenizer = nlp.tokenizer
 #########################################################################
+############################# Container #################################
 
-# parse, category_names = liwc.load_token_parser('LIWC2007_English100131.dic')
+# st.select_slider('Pick a size', ['S', 'M', 'L'])
+# st.date_input('Your birthday')
+# # container = st.container()
+# # container.write("I cannot collapse")
+# st.multiselect('Buy', ['milk', 'apples', 'potatoes'])
+# st.selectbox('Pick one', ['cats', 'dogs'])
+# st.color_picker('Pick a color')
+# st.text_area('Text to translate')
 
 
-
-
-# for pm in df["public_metrics"][0]:
-#   df[pm] = df["public_metrics"].apply(lambda x:x[pm])
-
-# df = df[(~df["clean_text"].isna())&(df["clean_text"].str.len()>0)&(df["clean_text"]!= "_url_")].copy()
-# df_no_dup = df.drop_duplicates("clean_text")
-
-
-# def getMoralCounts(text):
-#   tokens = tokenizer(text)
-#   tokens = [t.lower_ for t in tokens]
-#   return dict(Counter(category for token in tokens for category in parse(token)))
-
-# df_no_dup["moralFoundations"] = df_no_dup["clean_text"].apply(lambda x: getMoralCounts(x))
-
-# for category in category_names:
-#   df_no_dup[category] = df_no_dup["moralFoundations"].apply(lambda x: x[category] if category in x else 0)
-
-# st.write(df_no_dup.head())
-
+# collapsible = st.collapsible_container("Collapse me!")
+# collapsible.write("I can collapse")
 
 ############################## Hastag Analysis ################
 
@@ -280,7 +269,10 @@ def Sentiment():
 
 
 key=1
+
 selectOptions=['Network Analysis','Sentiment Analysis' , 'Hastag Analysis', 'Topic Modelling', 'Emotion Analysis', 'GeoCode']
+
+
 
 
 
@@ -289,7 +281,8 @@ selectOptions=['Network Analysis','Sentiment Analysis' , 'Hastag Analysis', 'Top
 def addSelect():
     global key
     global selectOptions
-    select= st.selectbox( '',selectOptions,key=str(key))
+    with st.beta_expander("TO add Analysis Tasks"):
+        select= st.selectbox( '',selectOptions,key=str(key))
     key+=1
 
     selector(select)
@@ -377,15 +370,16 @@ addSelect()
 
 
 t= pivot_ui(df)
-st.markdown("![Alt Text](https://pivottable.js.org/images/animation.gif)")
+with st.beta_expander("Expand me to understand How to work wit pivot table"):
+    st.markdown("![Alt Text](https://pivottable.js.org/images/animation.gif)")
 # video_file = open('animation.gif', 'rb')
 # video_bytes = video_file.read()
 
 # st.video(video_bytes)
 
-
-with open(t.src, encoding="utf8") as t:
-    components.html(t.read(), width=900, height=1000, scrolling=True)
+with st.beta_expander("Expand Me to see the DataFrame"):
+    with open(t.src, encoding="utf8") as t:
+        components.html(t.read(), width=900, height=1000, scrolling=True)
     
 
 
