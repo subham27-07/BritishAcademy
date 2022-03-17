@@ -121,18 +121,6 @@ tokenizer = nlp.tokenizer
 #########################################################################
 ############################# Container #################################
 
-# st.select_slider('Pick a size', ['S', 'M', 'L'])
-# st.date_input('Your birthday')
-# # container = st.container()
-# # container.write("I cannot collapse")
-# st.multiselect('Buy', ['milk', 'apples', 'potatoes'])
-# st.selectbox('Pick one', ['cats', 'dogs'])
-# st.color_picker('Pick a color')
-# st.text_area('Text to translate')
-
-
-# collapsible = st.collapsible_container("Collapse me!")
-# collapsible.write("I can collapse")
 
 ############################## Hastag Analysis ################
 
