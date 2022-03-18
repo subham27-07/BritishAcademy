@@ -370,8 +370,8 @@ with st.beta_expander("Expand Me to see the DataFrame"):
     
 
 with st.beta_expander("Expand me to understand How to work with pivot table"):
-    with st.beta_container():
-        st.markdown("![Alt Text](https://pivottable.js.org/images/animation.gif)")
+    
+    st.markdown("![Alt Text](https://pivottable.js.org/images/animation.gif)")
 
 
 
