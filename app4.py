@@ -269,7 +269,7 @@ selectOptions=['Network Analysis','Sentiment Analysis' , 'Hastag Analysis', 'Top
 def addSelect():
     global key
     global selectOptions
-    with st.beta_expander("TO add Analysis Tasks"):
+    with st.beta_expander("Add Analysis Tasks"):
         select= st.selectbox( '',selectOptions,key=str(key))
     key+=1
 
@@ -296,8 +296,8 @@ def selector(select):
         result=st.button('Analysis',key=7)
         if result:
             Sentiment()
-        random_tweet = st.radio('Show Examples', ('POS', 'NEU', 'NEG'))
-        st.markdown(df.query("label == @random_tweet")[["text"]].sample(n=1).iat[0, 0])
+            random_tweet = st.radio('Show Examples', ('POS', 'NEU', 'NEG'))
+            st.markdown(df.query("label == @random_tweet")[["text"]].sample(n=1).iat[0, 0])
         ind=selectOptions.index('Sentiment Analysis')
         selectOptions.pop(ind)
         addSelect()
@@ -316,8 +316,8 @@ def selector(select):
         result=st.button('Analysis',key=9)
         if result:
             emotionAnalysis()
-        random_tweet = st.radio('Shows Examples', ('amusement', 'anger', 'annoyance', 'confusion', 'disapproval', 'excitement', 'love', 'suprise'))
-        st.markdown(df.query("emotion == @random_tweet")[["text"]].sample(n=1).iat[0, 0])
+            random_tweet = st.radio('Shows Examples', ('amusement', 'anger', 'annoyance', 'confusion', 'disapproval', 'excitement', 'love', 'suprise'))
+            st.markdown(df.query("emotion == @random_tweet")[["text"]].sample(n=1).iat[0, 0])
         ind=selectOptions.index('Emotion Analysis')
         selectOptions.pop(ind)
         addSelect()
@@ -358,8 +358,7 @@ addSelect()
 
 
 t= pivot_ui(df)
-with st.beta_expander("Expand me to understand How to work wit pivot table"):
-    st.markdown("![Alt Text](https://pivottable.js.org/images/animation.gif)")
+
 # video_file = open('animation.gif', 'rb')
 # video_bytes = video_file.read()
 
@@ -367,10 +366,12 @@ with st.beta_expander("Expand me to understand How to work wit pivot table"):
 
 with st.beta_expander("Expand Me to see the DataFrame"):
     with open(t.src, encoding="utf8") as t:
-        components.html(t.read(), width=900, height=1000, scrolling=True)
+        components.html(t.read(), width=700, height=1000, scrolling=True)
     
 
-
+with st.beta_expander("Expand me to understand How to work with pivot table"):
+    with st.beta_container():
+        st.markdown("![Alt Text](https://pivottable.js.org/images/animation.gif)")
 
 
 
