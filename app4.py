@@ -70,16 +70,27 @@ from geopy.geocoders import Nominatim
 
 from pivottablejs import pivot_ui
 
-st.title ("Twitter Data Analysis Tool")
-# st.sidebar.title("Analysis of Tweets")
-st.markdown("This application is a Streamlit dashboard used to analyze sentiments, Emotions of tweets and Topic Modelling")
-# st.sidebar.markdown("This application is a Streamlit dashboard used ""to analyze sentiments of tweets")
+
+
+
+
+
+# st.title ("Twitter Data Analysis Tool")
+st.markdown("<h1 style='text-align: center; color: black;'>Twitter Data Analysis Tool</h1>", unsafe_allow_html=True)
+
+# st.markdown("This application is a Streamlit dashboard used to analyze sentiments, Emotions of tweets and Topic Modelling")
+
+st.markdown("<h3 style='text-align: center; color: black;'>This application is a Streamlit dashboard used to analyze sentiments,Hastag, Emotions of tweets and Topic Modelling</h3>", unsafe_allow_html=True)
+
 
 enc='utf-8'
-spectra=st.file_uploader("upload file", type={"pkl",'txt'})
+spectra=st.file_uploader("upload file", type={"csv",'txt'})
 if spectra is not None:
-    spectra_df=pd.read_pickle(spectra)
+    spectra_df=pd.read_csv(spectra)
 #st.write(spectra_df)
+
+
+
 
 
 ######################PICKLE###############################
@@ -90,8 +101,10 @@ if spectra is not None:
 df=spectra_df[:500]
 # st.write(df)
 
-
-
+# compression_opts = dict(method='zip',
+#                         archive_name='out.csv') 
+# df.to_csv('out.zip', index=False,
+#           compression=compression_opts)  
 ##################################################################
 
 #st.download_button(label='Download Current Result',data=df)
@@ -118,13 +131,72 @@ import re
 import liwc
 nlp = English()
 tokenizer = nlp.tokenizer
+
+import pydeck as pdk
 #########################################################################
-############################# Container #################################
+############################# Geocoding #################################
+# df2=df.dropna()
+# # st.write(df2)
+# x=df2[7:10]
+# import pandas as pd
+# from geopy.geocoders import Nominatim
+
+# geolocator = Nominatim(user_agent="myApp")
+# x[['location_lat', 'location_long']] = x['user_location'].apply(
+#     geolocator.geocode).apply(lambda x: pd.Series(
+#         [x.latitude, x.longitude], index=['location_lat', 'location_long']))
+
+
+# d = {'lat': x['location_lat'], 'lon': x['location_long']}
+# df3 = pd.DataFrame(data=d)
+
+# st.map(df3)
+################################# Map ########################
+# st.pydeck_chart(pdk.Deck(
+#      map_style='mapbox://styles/mapbox/light-v9',
+#      initial_view_state=pdk.ViewState(
+#          latitude=37.76,
+#          longitude=-122.4,
+#          zoom=11,
+#          pitch=50,
+#      ),
+#      layers=[
+#          pdk.Layer(
+#             'HexagonLayer',
+#             data=df3,
+#             get_position='[lon, lat]',
+#             radius=200,
+#             elevation_scale=50,
+#             elevation_range=[0, 1000000],
+#             pickable=True,
+#             extruded=True,
+#          ),
+#          pdk.Layer(
+#              'ScatterplotLayer',
+#              data=df3,
+#              get_position='[lon, lat]',
+#              get_color='[200, 30, 0, 160]',
+#              get_radius=200,
+#          ),
+#      ],
+#  ))
 
 
 ############################## Hastag Analysis ################
 
 
+
+def _max_width_(prcnt_width:int = 70):
+    max_width_str = f"max-width: {prcnt_width}%;"
+    st.markdown(f""" 
+                <style> 
+                .reportview-container .main .block-container{{{max_width_str}}}
+                </style>    
+                """, 
+                unsafe_allow_html=True,
+    )
+
+st.cache(suppress_st_warning=True)
 def hastag():
     G = nx.DiGraph()
     for i,row in df.iterrows():
@@ -170,7 +242,7 @@ def hastag():
 
 #####################################################################
 
-
+st.cache(suppress_st_warning=True)
 def emotionAnalysis():
     emotion = pipeline('sentiment-analysis', model='arpanghoshal/EmoRoBERTa')
     def get_emotion_label(text):
@@ -191,7 +263,7 @@ def emotionAnalysis():
 
 
 
-
+st.cache(suppress_st_warning=True)
 def TopiModelling():
     global df
     model = BERTopic(language="english")
@@ -220,7 +292,7 @@ def TopiModelling():
         df["topic_words"] =  df["topics"].apply(lambda x: topic_num_words_map[x])
 
 
-
+st.cache(suppress_st_warning=True)
 def Sentiment():
     global df
     model_name = "finiteautomata/bertweet-base-sentiment-analysis"
@@ -292,6 +364,7 @@ def selector(select):
         
     elif select == 'Sentiment Analysis':
         st.markdown("Sentiment analysis, also referred to as opinion mining, is an approach to natural language processing (NLP) that identifies the emotional tone behind a body of text. This is a popular way for organizations to determine and categorize opinions about a product, service, or idea.")
+        st.write("Sentiment Analysis uses the Hugging Face Transformer to learn more about Hugging Face [link](https://share.streamlit.io/mesmith027/streamlit_webapps/main/MC_pi/streamlit_app.py)")
         st.image("full_nlp_pipeline.png")
         result=st.button('Analysis',key=7)
         if result:
@@ -330,6 +403,7 @@ def selector(select):
         
 
 addSelect()
+_max_width_()
     
 ############################ Topic Modelling ################################
 
