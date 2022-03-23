@@ -364,7 +364,7 @@ def selector(select):
         
     elif select == 'Sentiment Analysis':
         st.markdown("Sentiment analysis, also referred to as opinion mining, is an approach to natural language processing (NLP) that identifies the emotional tone behind a body of text. This is a popular way for organizations to determine and categorize opinions about a product, service, or idea.")
-        st.write("Sentiment Analysis uses the Hugging Face Transformer to learn more about Hugging Face [link](https://share.streamlit.io/mesmith027/streamlit_webapps/main/MC_pi/streamlit_app.py)")
+        st.write("Sentiment Analysis uses the Hugging Face Transformer to learn more about Hugging Face 🤗 [link](https://huggingface.co/docs/transformers/main_classes/pipelines)")
         st.image("full_nlp_pipeline.png")
         result=st.button('Analysis',key=7)
         if result:
