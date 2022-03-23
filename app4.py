@@ -315,15 +315,6 @@ def Sentiment():
 
 
 ######################################GeoCode#############################################
-# geolocator = Nominatim(user_agent='twitter-analysis-cl')
-# locs=df['user_location']
-# geolocated = list(map(lambda x: [x,geolocator.geocode(x)[1] if geolocator.geocode(x) else None],locs))
-# geolocated = pd.DataFrame(geolocated)
-# geolocated.columns = ['locat','latlong']
-# geolocated['lat'] = geolocated.latlong.apply(lambda x: x[0])
-# geolocated['lon'] = geolocated.latlong.apply(lambda x: x[1])
-# geolocated.drop('latlong',axis=1, inplace=True)
-
 
 ##################################################################################
 
@@ -352,9 +343,14 @@ def selector(select):
     global selectOptions
 
     if select == 'Topic Modelling':
-        st.markdown("Topic Models are very useful for the purpose for document clustering, organizing large blocks of textual data, information retrieval from unstructured text and feature selection.")
-        st.image("Topic Model.png")
-        st.markdown("Where the frequency of each word t is extracted for each class i and divided by the total number of words w. This action can be seen as a form of regularization of frequent words in the class. Next, the total, unjoined, number of documents m is divided by the total frequency of word t across all classes n.")
+        st.markdown("<p style='text-align: center; color: black;'>Topic Models are very useful for the purpose for document clustering, organizing large blocks of textual data, information retrieval from unstructured text and feature selection.</p>", unsafe_allow_html=True)
+        # st.markdown("Topic Models are very useful for the purpose for document clustering, organizing large blocks of textual data, information retrieval from unstructured text and feature selection.")
+        col1, col2, col3 = st.beta_columns([1,6,1])
+        with col2:
+            st.image("Topic Model.png")
+        # st.image("Topic Model.png")
+        st.markdown("<p style='text-align: center; color: black;'>Where the frequency of each word t is extracted for each class i and divided by the total number of words w. This action can be seen as a form of regularization of frequent words in the class. Next, the total, unjoined, number of documents m is divided by the total frequency of word t across all classes n.</p>", unsafe_allow_html=True)
+        # st.markdown("Where the frequency of each word t is extracted for each class i and divided by the total number of words w. This action can be seen as a form of regularization of frequent words in the class. Next, the total, unjoined, number of documents m is divided by the total frequency of word t across all classes n.")
         result=st.button('Analysis',key=6)
         if result:
             TopiModelling()
@@ -363,9 +359,14 @@ def selector(select):
         addSelect()
         
     elif select == 'Sentiment Analysis':
-        st.markdown("Sentiment analysis, also referred to as opinion mining, is an approach to natural language processing (NLP) that identifies the emotional tone behind a body of text. This is a popular way for organizations to determine and categorize opinions about a product, service, or idea.")
+        st.markdown("<p style='text-align: center; color: black;'>Sentiment analysis, also referred to as opinion mining, is an approach to natural language processing (NLP) that identifies the emotional tone behind a body of text. This is a popular way for organizations to determine and categorize opinions about a product, service, or idea.</p>", unsafe_allow_html=True)
+        # st.markdown("Sentiment analysis, also referred to as opinion mining, is an approach to natural language processing (NLP) that identifies the emotional tone behind a body of text. This is a popular way for organizations to determine and categorize opinions about a product, service, or idea.")
         st.write("Sentiment Analysis uses the Hugging Face Transformer to learn more about Hugging Face 🤗 [link](https://huggingface.co/docs/transformers/main_classes/pipelines)")
-        st.image("full_nlp_pipeline.png")
+        col1, col2, col3 = st.beta_columns([1,6,1])
+        with col2:
+            st.image("full_nlp_pipeline.png")
+
+        # st.image("full_nlp_pipeline.png")
         result=st.button('Analysis',key=7)
         if result:
             Sentiment()
@@ -376,7 +377,8 @@ def selector(select):
         addSelect()
     
     elif select == 'Hastag Analysis':
-        st.markdown("Hastag Analysis is used to measure the social media reach of hashtag campaign and its mentions. To measure social media engagement around your hashtag. To discover social media sentiment around a hashtag.")
+        st.markdown("<p style='text-align: center; color: black;'>Hastag Analysis is used to measure the social media reach of hashtag campaign and its mentions. To measure social media engagement around your hashtag. To discover social media sentiment around a hashtag.</p>", unsafe_allow_html=True)
+        # st.markdown("Hastag Analysis is used to measure the social media reach of hashtag campaign and its mentions. To measure social media engagement around your hashtag. To discover social media sentiment around a hashtag.")
         result=st.button('Analysis',key=8)
         if result:
             hastag()
@@ -385,7 +387,8 @@ def selector(select):
         addSelect()
 
     elif select == 'Emotion Analysis':
-        st.markdown("Emotion analysis is the process of identifying and analyzing the underlying emotions expressed in textual data. Emotion analytics can extract the text data from multiple sources to analyze the subjective information and understand the emotions behind it.")
+        st.markdown("<p style='text-align: center; color: black;'>Emotion analysis is the process of identifying and analyzing the underlying emotions expressed in textual data. Emotion analytics can extract the text data from multiple sources to analyze the subjective information and understand the emotions behind it.</p>", unsafe_allow_html=True)
+        # st.markdown("Emotion analysis is the process of identifying and analyzing the underlying emotions expressed in textual data. Emotion analytics can extract the text data from multiple sources to analyze the subjective information and understand the emotions behind it.")
         result=st.button('Analysis',key=9)
         if result:
             emotionAnalysis()
