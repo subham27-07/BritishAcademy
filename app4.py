@@ -62,8 +62,12 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipe
 
 from geopy.geocoders import Nominatim
 
-################### Redis Cache ################
-
+################### Sentiment Example Library import ################
+from transformers import AutoModelForSequenceClassification
+from transformers import TFAutoModelForSequenceClassification
+from transformers import AutoTokenizer, AutoConfig
+import numpy as np
+from scipy.special import softmax
 ###############################Import LIWC############
 
 ############################################################
@@ -135,11 +139,11 @@ tokenizer = nlp.tokenizer
 import pydeck as pdk
 #########################################################################
 ############################# Geocoding #################################
-# df2=df.dropna()
-# # st.write(df2)
-# x=df2[7:10]
-# import pandas as pd
-# from geopy.geocoders import Nominatim
+df2=df.dropna()
+# st.write(df2)
+x=df2[7:10]
+import pandas as pd
+from geopy.geocoders import Nominatim
 
 # geolocator = Nominatim(user_agent="myApp")
 # x[['location_lat', 'location_long']] = x['user_location'].apply(
@@ -151,7 +155,7 @@ import pydeck as pdk
 # df3 = pd.DataFrame(data=d)
 
 # st.map(df3)
-################################# Map ########################
+# ################################# Map ########################
 # st.pydeck_chart(pdk.Deck(
 #      map_style='mapbox://styles/mapbox/light-v9',
 #      initial_view_state=pdk.ViewState(
@@ -258,7 +262,28 @@ def emotionAnalysis():
 
 # st.write(fig)
 
-    
+##########################Test for user input ################################
+
+
+
+def preprocess(text):
+    new_text = []
+    for t in text.split(" "):
+        t = '@user' if t.startswith('@') and len(t) > 1 else t
+        t = 'http' if t.startswith('http') else t
+        new_text.append(t)
+    return " ".join(new_text)
+MODEL = f"cardiffnlp/twitter-roberta-base-sentiment-latest"
+tokenizer = AutoTokenizer.from_pretrained(MODEL)
+config = AutoConfig.from_pretrained(MODEL)
+# PT
+model = AutoModelForSequenceClassification.from_pretrained(MODEL)
+
+
+
+
+
+##############################################################################
 
 
 
@@ -324,7 +349,8 @@ key=1
 selectOptions=['Network Analysis','Sentiment Analysis' , 'Hastag Analysis', 'Topic Modelling', 'Emotion Analysis', 'GeoCode']
 
 
-
+emotion = pipeline('sentiment-analysis', 
+                    model='arpanghoshal/EmoRoBERTa')
 
 
 
@@ -348,7 +374,7 @@ def selector(select):
         col1, col2, col3 = st.beta_columns([1,6,1])
         with col2:
             st.image("Topic Model.png")
-        # st.image("Topic Model.png")
+        st.image("Topic Model.png")
         st.markdown("<p style='text-align: center; color: black;'>Where the frequency of each word t is extracted for each class i and divided by the total number of words w. This action can be seen as a form of regularization of frequent words in the class. Next, the total, unjoined, number of documents m is divided by the total frequency of word t across all classes n.</p>", unsafe_allow_html=True)
         # st.markdown("Where the frequency of each word t is extracted for each class i and divided by the total number of words w. This action can be seen as a form of regularization of frequent words in the class. Next, the total, unjoined, number of documents m is divided by the total frequency of word t across all classes n.")
         result=st.button('Analysis',key=6)
@@ -367,6 +393,28 @@ def selector(select):
             st.image("full_nlp_pipeline.png")
 
         # st.image("full_nlp_pipeline.png")
+        text = st.text_input("Test Our Model with Example")
+        if text:
+            text = preprocess(text)
+            encoded_input = tokenizer(text, return_tensors='pt')
+            output = model(**encoded_input)
+            scores = output[0][0].detach().numpy()
+            scores = softmax(scores)
+            # # TF
+            # model = TFAutoModelForSequenceClassification.from_pretrained(MODEL)
+            # model.save_pretrained(MODEL)
+            # text = "Covid cases are increasing fast!"
+            # encoded_input = tokenizer(text, return_tensors='tf')
+            # output = model(encoded_input)
+            # scores = output[0][0].numpy()
+            # scores = softmax(scores)
+            # Print labels and scores
+            ranking = np.argsort(scores)
+            ranking = ranking[::-1]
+            for i in range(scores.shape[0]):
+                l = config.id2label[ranking[i]]
+                s = scores[ranking[i]]
+                st.write(f"{i+1}) {l} {np.round(float(s), 4)}")
         result=st.button('Analysis',key=7)
         if result:
             Sentiment()
@@ -388,7 +436,21 @@ def selector(select):
 
     elif select == 'Emotion Analysis':
         st.markdown("<p style='text-align: center; color: black;'>Emotion analysis is the process of identifying and analyzing the underlying emotions expressed in textual data. Emotion analytics can extract the text data from multiple sources to analyze the subjective information and understand the emotions behind it.</p>", unsafe_allow_html=True)
+        st.write("Emotion Analysis uses the Hugging Face Transformer to learn more about Hugging Face 🤗 [link](https://huggingface.co/docs/transformers/main_classes/pipelines)")
         # st.markdown("Emotion analysis is the process of identifying and analyzing the underlying emotions expressed in textual data. Emotion analytics can extract the text data from multiple sources to analyze the subjective information and understand the emotions behind it.")
+        text1 = st.text_input("Test Our Model with Example",key=2)
+        if text1:
+            text1 = preprocess(text1)
+            # st.write(text1)
+            output = emotion(text1)
+            # st.write(output)
+
+            for i in output:
+                # st.write(i)
+                new_list = list(i.values())
+                # st.write(new_list)
+                st.write(str(new_list)[1:-1])
+
         result=st.button('Analysis',key=9)
         if result:
             emotionAnalysis()

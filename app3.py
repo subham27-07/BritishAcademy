@@ -185,7 +185,7 @@ def hastag():
             allHashtags.append(j)
 
     hashtagCounts = sorted(Counter(allHashtags).items(),key=lambda x: x[1],reverse=True)
-
+    
     fig = px.bar(x=[i[1] for i in hashtagCounts[:20]],y=[i[0] for i in hashtagCounts[:20]],color=[i[1] for i in hashtagCounts[:20]])
 
     st.write(fig)
