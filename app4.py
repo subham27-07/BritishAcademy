@@ -306,7 +306,7 @@ def hateAnalysis():
 
     figT = px.scatter(df, x=df['hate_Speech'], y=df['created_at'], marginal_x="histogram", marginal_y="rug",color=df['hate_Speech'],hover_data=['clean_text'], width=700,height=900)
     
-    st.plotly_chart(figT, use_container_width=False)
+    st.plotly_chart(figT)
 
 
 
