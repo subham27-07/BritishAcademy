@@ -78,6 +78,7 @@ import urllib.request
 from pivottablejs import pivot_ui
 
 
+from sklearn.feature_extraction.text import CountVectorizer
 
 
 
@@ -396,6 +397,8 @@ def TopiModelling():
     docs = list(df['clean_text'].values)
 
     topics, probs = model.fit_transform(docs)
+    vectorizer_model = CountVectorizer(ngram_range=(1, 2), stop_words="english")
+    model.update_topics(docs, topics, vectorizer_model=vectorizer_model)
 
     model.get_topic_freq()
     x=model.get_topic(0)
