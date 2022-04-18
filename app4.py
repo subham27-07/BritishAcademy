@@ -58,6 +58,7 @@ from transformers import GPT2Tokenizer
 from typing import NamedTuple
 
 
+
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
 
 from geopy.geocoders import Nominatim
@@ -76,9 +77,10 @@ import urllib.request
 ############################################################
 
 from pivottablejs import pivot_ui
+from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode, DataReturnMode, JsCode
+# from st_aggrid import AgGrid
 
 
-from sklearn.feature_extraction.text import CountVectorizer
 
 
 
@@ -451,15 +453,61 @@ def Sentiment():
     fig2 = px.pie(sentiment_count,values='Tweets',names='Sentiments')
     st.plotly_chart(fig2)
 
+    ######################### altair ########################
+    # figW = px.scatter(df, x=df['score'], y=df['created_at'], color=df['label'],
+    #              size=df['score'], hover_data=['clean_text'])
+
+    df_new = df.loc[(df['label'] =='Negative') & (df['score']>0.6)]
+    # st.write(df_new)
+
+    df_new1 = df.loc[(df['label'] =='Positive') & (df['score']>0.5)]
+    # st.write(df_new1)
+
+    df_new2 = df.loc[(df['label'] =='Neutral') & (df['score']>0.5)]
+    # st.write(df_new2)
+
+
+
+
+
+
+
+    figW = px.scatter(df_new, x=df_new['score'], y=df_new['created_at'], color=df_new['label'],
+                 size=df_new['score'], hover_data=['clean_text'])
+    st.plotly_chart(figW)
+
+    figQ = px.scatter(df_new1, x=df_new1['score'], y=df_new1['created_at'],
+                 size=df_new1['score'], hover_data=['clean_text'])
+    st.plotly_chart(figQ)
+
+    figR = px.scatter(df_new2, x=df_new2['score'], y=df_new2['created_at'], color=df_new2['label'],
+                 size=df_new2['score'], hover_data=['clean_text'])
+    st.plotly_chart(figR)
+
+    # for i in range(1, 3):
+    #     cols = st.beta_columns(3)
+    #     cols[0].write(st.plotly_chart(figW))
+    #     cols[1].write(st.plotly_chart(figQ))
+    #     cols[2].write(st.plotly_chart(figR))
+        
+
+
+
+    #########################################################
 
     # fig = px.scatter(df, x=df['score'], y=df['created_at'], marginal_x="histogram", marginal_y="rug",color=df['label'], width=700,height=900)
     # fig3 = px.scatter( df,x='label',y='created_at',color='label',size='score', hover_data=['clean_text'],width=700,height=900)
 
     # st.plotly_chart(fig3)
+    # fig = px.scatter(df, x=df[df['label']=='Negative'], y=df['score'], width=700,height=900)
+
+   
+    
 
     figP = px.scatter(df, x=df['label'], y=df['created_at'], marginal_x="histogram", marginal_y="rug",color=df['label'],size='score',hover_data=['clean_text'], width=700,height=900)
     
     st.plotly_chart(figP)
+    
 
 
 
@@ -473,6 +521,7 @@ selectOptions=['Network Analysis','Sentiment Analysis' ,'Hate Speech Analysis' ,
 
 emotion = pipeline('sentiment-analysis', 
                     model='arpanghoshal/EmoRoBERTa')
+
 
 
 
@@ -491,57 +540,54 @@ def selector(select):
     global selectOptions
 
     if select == 'Topic Modelling':
-        st.markdown("<h2 style='text-align: center; color: black;'>Topic Models are very useful for the purpose for document clustering, organizing large blocks of textual data, information retrieval from unstructured text and feature selection.</h2>", unsafe_allow_html=True)
-        # st.markdown("Topic Models are very useful for the purpose for document clustering, organizing large blocks of textual data, information retrieval from unstructured text and feature selection.")
+        st.markdown("<h3 style='text-align: left; color: black;'>Topic Models are very useful for the purpose for document clustering, organizing large blocks of textual data, information retrieval from unstructured text and feature selection.</h3>", unsafe_allow_html=True)
         col1, col2, col3 = st.beta_columns([1,6,1])
         with col2:
             st.image("Topic Model.png")
         # st.image("Topic Model.png")
-        st.markdown("<h2 style='text-align: center; color: black;'>Where the frequency of each word t is extracted for each class i and divided by the total number of words w. This action can be seen as a form of regularization of frequent words in the class. Next, the total, unjoined, number of documents m is divided by the total frequency of word t across all classes n.</h2>", unsafe_allow_html=True)
-        # st.markdown("Where the frequency of each word t is extracted for each class i and divided by the total number of words w. This action can be seen as a form of regularization of frequent words in the class. Next, the total, unjoined, number of documents m is divided by the total frequency of word t across all classes n.")
+        st.markdown("<h3 style='text-align: left; color: black;'>Where the frequency of each word t is extracted for each class i and divided by the total number of words w. This action can be seen as a form of regularization of frequent words in the class. Next, the total, unjoined, number of documents m is divided by the total frequency of word t across all classes n.</h3>", unsafe_allow_html=True)
         result=st.button('Analysis',key=6)
         if result:
             TopiModelling()
         ind=selectOptions.index('Topic Modelling')
         selectOptions.pop(ind)
         addSelect()
-        
+       
     elif select == 'Sentiment Analysis':
-        st.markdown("<h2 style='text-align: center; color: black;'>Sentiment analysis, also referred to as opinion mining, is an approach to natural language processing (NLP) that identifies the emotional tone behind a body of text. This is a popular way for organizations to determine and categorize opinions about a product, service, or idea.</h2>", unsafe_allow_html=True)
-        # st.markdown("Sentiment analysis, also referred to as opinion mining, is an approach to natural language processing (NLP) that identifies the emotional tone behind a body of text. This is a popular way for organizations to determine and categorize opinions about a product, service, or idea.")
-        st.write("Sentiment Analysis uses the Hugging Face Transformer to learn more about Hugging Face 🤗 [link](https://huggingface.co/docs/transformers/main_classes/pipelines)")
-        # col1, col2, col3 = st.beta_columns([1,6,1])
-        # with col2:
-        #     st.image("full_nlp_pipeline.png")
+        with st.beta_expander("Expand Me to see the Sentiment Analysis"): 
+            st.markdown("<h3 style='text-align: left; color: black;'>Sentiment analysis, also referred to as opinion mining, is an approach to natural language processing (NLP) that identifies the emotional tone behind a body of text. This is a popular way for organizations to determine and categorize opinions about a product, service, or idea.</h3>", unsafe_allow_html=True)
+            st.write("Sentiment Analysis uses the Hugging Face Transformer to learn more about Hugging Face 🤗 [link](https://huggingface.co/docs/transformers/main_classes/pipelines)")
+            # col1, col2, col3 = st.beta_columns([1,6,1])
+            # with col2:
+            #     st.image("full_nlp_pipeline.png")
 
-        # st.image("full_nlp_pipeline.png")
-        st.markdown("<h2 style='text-align: center; color: black;'>Test Our Model with Example.</h2>", unsafe_allow_html=True)
-        text = st.text_input("")
-        if text:
-            text = preprocess(text)
-            encoded_input = tokenizer(text, return_tensors='pt')
-            output = model(**encoded_input)
-            scores = output[0][0].detach().numpy()
-            scores = softmax(scores)
-            ranking = np.argsort(scores)
-            ranking = ranking[::-1]
-            for i in range(scores.shape[0]):
-                l = config.id2label[ranking[i]]
-                s = scores[ranking[i]]
-                st.write(f"{i+1}) {l} {np.round(float(s), 4)}")
-        st.markdown("<h2 style='text-align: center; color: black;'>If you are Satisfied with the result please go ahead and Analyze</h2>", unsafe_allow_html=True)
-        result=st.button('Analysis',key=7)
-        if result:
-            Sentiment()
-            # random_tweet = st.radio('Show Examples', ('POS', 'NEU', 'NEG'))
-            # st.markdown(df.query("label == @random_tweet")[["text"]].sample(n=1).iat[0, 0])
+            # st.image("full_nlp_pipeline.png")
+            st.markdown("<h3 style='text-align: center; color: black;'>Test the Model with Example.</h3>", unsafe_allow_html=True)
+            text = st.text_input("")
+            if text:
+                text = preprocess(text)
+                encoded_input = tokenizer(text, return_tensors='pt')
+                output = model(**encoded_input)
+                scores = output[0][0].detach().numpy()
+                scores = softmax(scores)
+                ranking = np.argsort(scores)
+                ranking = ranking[::-1]
+                for i in range(scores.shape[0]):
+                    l = config.id2label[ranking[i]]
+                    s = scores[ranking[i]]
+                    st.write(f"{i+1}) {l} {np.round(float(s), 4)}")
+            st.markdown("<h3 style='text-align: center; color: black;'>If you are Satisfied with the result please go ahead and Analyze</h3>", unsafe_allow_html=True)
+            result=st.button('Analysis',key=7)
+            if result:
+                Sentiment()
+                # random_tweet = st.radio('Show Examples', ('POS', 'NEU', 'NEG'))
+                # st.markdown(df.query("label == @random_tweet")[["text"]].sample(n=1).iat[0, 0])
         ind=selectOptions.index('Sentiment Analysis')
         selectOptions.pop(ind)
         addSelect()
     
     elif select == 'Hastag Analysis':
-        st.markdown("<h2 style='text-align: center; color: black;'>Hastag Analysis is used to measure the social media reach of hashtag campaign and its mentions. To measure social media engagement around your hashtag. To discover social media sentiment around a hashtag.</h2>", unsafe_allow_html=True)
-        # st.markdown("Hastag Analysis is used to measure the social media reach of hashtag campaign and its mentions. To measure social media engagement around your hashtag. To discover social media sentiment around a hashtag.")
+        st.markdown("<h3 style='text-align: center; color: black;'>Hastag Analysis is used to measure the social media reach of hashtag campaign and its mentions. To measure social media engagement around your hashtag. To discover social media sentiment around a hashtag.</h3>", unsafe_allow_html=True)
         result=st.button('Analysis',key=8)
         if result:
             hastag()
@@ -550,12 +596,9 @@ def selector(select):
         addSelect()
 
     elif select == 'Hate Speech Analysis':
-        st.markdown("<h2 style='text-align: center; color: black;'>Hate Speech in the form of racist and sexist remarks are a common occurance on social media.“Hate speech is defined as any communication that disparages a person or a group on the basis of some characteristics such as race, color, ethnicity, gender, sexual orientation, nationality, religion, or other characteristic.</h2>", unsafe_allow_html=True)
-        # st.markdown("Hastag Analysis is used to measure the social media reach of hashtag campaign and its mentions. To measure social media engagement around your hashtag. To discover social media sentiment around a hashtag.")
+        st.markdown("<h3 style='text-align: center; color: black;'>Hate Speech in the form of racist and sexist remarks are a common occurance on social media.“Hate speech is defined as any communication that disparages a person or a group on the basis of some characteristics such as race, color, ethnicity, gender, sexual orientation, nationality, religion, or other characteristic.</h3>", unsafe_allow_html=True)
         st.write("This is a roBERTa-base model trained on ~58M tweets and finetuned for hate speech detection with the TweetEval benchmark. 🤗 [link](https://huggingface.co/cardiffnlp/twitter-roberta-base-hate?text=I+like+you.+I+love+you)")
-        # st.markdown("Emotion analysis is the process of identifying and analyzing the underlying emotions expressed in textual data. Emotion analytics can extract the text data from multiple sources to analyze the subjective information and understand the emotions behind it.")
-        st.markdown("<h2 style='text-align: center; color: black;'>Test Our Model with Example.</h2>", unsafe_allow_html=True)
-        # st.subheader('Test our Model with your input example')
+        st.markdown("<h3 style='text-align: center; color: black;'>Test the Model with Example.</h3>", unsafe_allow_html=True)
         textA = st.text_input("",key=3)
         if textA:
             text = preprocess(textA)
@@ -578,11 +621,9 @@ def selector(select):
         addSelect()
 
     elif select == 'Emotion Analysis':
-        st.markdown("<h2 style='text-align: center; color: black;'>Emotion analysis is the process of identifying and analyzing the underlying emotions expressed in textual data. Emotion analytics can extract the text data from multiple sources to analyze the subjective information and understand the emotions behind it.</h2>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: center; color: black;'>Emotion analysis is the process of identifying and analyzing the underlying emotions expressed in textual data. Emotion analytics can extract the text data from multiple sources to analyze the subjective information and understand the emotions behind it.</h3>", unsafe_allow_html=True)
         st.write("Emotion Analysis uses the Hugging Face Transformer to learn more about Hugging Face 🤗 [link](https://huggingface.co/docs/transformers/main_classes/pipelines)")
-        # st.markdown("Emotion analysis is the process of identifying and analyzing the underlying emotions expressed in textual data. Emotion analytics can extract the text data from multiple sources to analyze the subjective information and understand the emotions behind it.")
-        st.markdown("<h2 style='text-align: center; color: black;'>Test Our Model with Example.</h2>", unsafe_allow_html=True)
-        # st.subheader('Test our Model with your input example')
+        st.markdown("<h3 style='text-align: center; color: black;'>Test Our Model with Example.</h3>", unsafe_allow_html=True)
         text1 = st.text_input("",key=2)
         if text1:
             text = preprocess(text1)
@@ -597,7 +638,7 @@ def selector(select):
                 s = scores[ranking[i]]
                 # st.write(f"{i+1}) {l} {np.round(float(s), 4)}")
                 st.write(f"{i+1}) {l} {np.round(float(s), 4)}")
-        st.markdown("<h2 style='text-align: center; color: black;'>If you are Satisfied with the result please go ahead and Analyze</h2>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: center; color: black;'>If you are Satisfied with the result please go ahead and Analyze</h3>", unsafe_allow_html=True)
         result=st.button('Analysis',key=13)
         if result:
             emotionAnalysis()
@@ -645,6 +686,27 @@ _max_width_()
 
 t= pivot_ui(df)
 
+gb = GridOptionsBuilder.from_dataframe(df)
+gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc='sum', editable=True)
+gb.configure_side_bar()
+gb.configure_pagination(paginationAutoPageSize=True)
+cellsytle_jscode = JsCode("""
+function(params) {
+    if (params.value == 'A') {
+        return {
+            'color': 'white',
+            'backgroundColor': 'darkred'
+        }
+    } else {
+        return {
+            'color': 'black',
+            'backgroundColor': 'white'
+        }
+    }
+};
+""")
+gb.configure_column("group", cellStyle=cellsytle_jscode)
+AgGrid(df)
 # video_file = open('animation.gif', 'rb')
 # video_bytes = video_file.read()
 
