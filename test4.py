@@ -122,7 +122,7 @@ if spectra is not None:
 
 ################################################
 
-df=spectra_df[:1000]
+df=spectra_df[:500]
 # st.write(df)
 
 # compression_opts = dict(method='zip',
@@ -227,7 +227,6 @@ def hastag():
     
 
     hashtagCounts = sorted(Counter(allHashtags).items(),key=lambda x: x[1],reverse=True)
-    
 
     fig = px.bar(x=[i[1] for i in hashtagCounts[:20]],y=[i[0] for i in hashtagCounts[:20]],color=[i[1] for i in hashtagCounts[:20]])
 
@@ -407,21 +406,20 @@ def TopiModelling():
     docs = list(df['clean_text'].values)
 
     topics, probs = model.fit_transform(docs)
-    vectorizer_model = CountVectorizer(ngram_range=(1, 3), stop_words="english")
+    vectorizer_model = CountVectorizer(ngram_range=(1, 2), stop_words="english")
     model.update_topics(docs, topics, vectorizer_model=vectorizer_model)
 
     model.get_topic_freq()
     x=model.get_topic(0)
     y=model.get_topic(2)
-    r=model.visualize_heatmap()
-    s=model.visualize_barchart(top_n_topics=10,height=200,width=250)
-    t=model.visualize_hierarchy(top_n_topics=100,height=1500)
+    #r=model.visualize_heatmap()
+    s=model.visualize_barchart(top_n_topics=5,height=200,width=250)
+    t=model.visualize_hierarchy(top_n_topics=50,height=1500)
     
     
     st.write(s)
     
     st.write(t)
-    st.write(r)
 
     topic_freq = model.get_topic_info()
     topic_num_words_map = {row["Topic"]:row["Name"] for i,row in topic_freq.iterrows()}
@@ -532,7 +530,7 @@ def Sentiment():
 
 key=1
 
-selectOptions=['Add Analysis Tasks','Sentiment Analysis' ,'Hate Speech Analysis' , 'Hastag Analysis', 'Topic Modelling', 'Emotion Analysis']
+selectOptions=['Network Analysis','Sentiment Analysis' ,'Hate Speech Analysis' , 'Hastag Analysis', 'Topic Modelling', 'Emotion Analysis', 'GeoCode']
 
 
 emotion = pipeline('sentiment-analysis', 
@@ -560,9 +558,9 @@ def selector(select):
                 st.image("Topic Model.png")
             # st.image("Topic Model.png")
             st.markdown('<p style="font-family:sans-serif;text-align: left; color:Black;font-size: 16px;">Where the frequency of each word t is extracted for each class i and divided by the total number of words w. This action can be seen as a form of regularization of frequent words in the class. Next, the total, unjoined, number of documents m is divided by the total frequency of word t across all classes n.</p>', unsafe_allow_html=True)
-            # result=st.button('Analyze',key=6)
-            # if result:
-            TopiModelling()
+            result=st.button('Analyze',key=6)
+            if result:
+                TopiModelling()
         ind=selectOptions.index('Topic Modelling')
         selectOptions.pop(ind)
         addSelect()
@@ -590,11 +588,11 @@ def selector(select):
                     l = config.id2label[ranking[i]]
                     s = scores[ranking[i]]
                     st.write(f"{i+1}) {l} {np.round(float(s), 4)}")
-            # st.markdown('<p style="font-family:sans-serif;text-align: center; color:Black;font-size: 18px;">If you are Satisfied with the result please go ahead and Analyze</p>', unsafe_allow_html=True)
+            st.markdown('<p style="font-family:sans-serif;text-align: center; color:Black;font-size: 18px;">If you are Satisfied with the result please go ahead and Analyze</p>', unsafe_allow_html=True)
             
-            # result=st.button('Analysis',key=7)
-            # if result:
-            Sentiment()
+            result=st.button('Analysis',key=7)
+            if result:
+                Sentiment()
                 # random_tweet = st.radio('Show Examples', ('POS', 'NEU', 'NEG'))
                 # st.markdown(df.query("label == @random_tweet")[["text"]].sample(n=1).iat[0, 0])
         ind=selectOptions.index('Sentiment Analysis')
@@ -727,15 +725,13 @@ function(params) {
 };
 """)
 gb.configure_column("group", cellStyle=cellsytle_jscode)
-
-with st.beta_expander("Expand Me to see the Data"):
-    AgGrid(df,fit_columns_on_grid_load=True,enable_enterprise_modules=True)
+AgGrid(df)
 # video_file = open('animation.gif', 'rb')
 # video_bytes = video_file.read()
 
 # st.video(video_bytes)
 
-with st.beta_expander("Expand Me to see the DataFrame and Visualize"):
+with st.beta_expander("Expand Me to see the DataFrame"):
     with open(t.src, encoding="utf8") as t:
         components.html(t.read(), width=1300, height=1000, scrolling=True)
     
