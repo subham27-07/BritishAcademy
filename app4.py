@@ -1,5 +1,8 @@
 #APP
 #checked
+from io import BytesIO
+from pyxlsb import open_workbook as open_xlsb
+
 from linecache import cache
 import streamlit as st
 import pandas as pd 
@@ -538,6 +541,9 @@ selectOptions=['Add Analysis Tasks','Sentiment Analysis' ,'Hate Speech Analysis'
 emotion = pipeline('sentiment-analysis', 
                     model='arpanghoshal/EmoRoBERTa')
 
+def to_excel(df):
+    output=BytesIO()
+
 
 def addSelect():
     global key
@@ -687,16 +693,9 @@ _max_width_()
 
 
 
-
-###################################################################################################
-
-
-
     
 
-###################################################################################
 
-###################################################################################################
 
 
 
