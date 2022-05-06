@@ -294,6 +294,9 @@ def emotionAnalysis():
     
     st.plotly_chart(fig8)
 # st.write(fig)
+
+
+
 ############################################## Hate Sppech ################################
 
 st.cache(suppress_st_warning=True,persist=True)
